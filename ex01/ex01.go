@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"github.com/NgTrNamKhanh/go23/ex01/ulti/ulti"
 )
 
 func main() {
@@ -13,6 +14,11 @@ func main() {
 	fmt.Print("Enter your input: ")
 
 	input, err := reader.ReadString('\n')
+
+
+	result := 
+	fmt.Print()
+
 	if err != nil {
 		fmt.Println("Error reading input:", err)
 		return
@@ -51,3 +57,5 @@ func main() {
 
 	fmt.Println(fullName)
 }
+
+
