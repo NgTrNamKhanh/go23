@@ -1,14 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"flag"
+	"fmt"
+	"go23/ex02/ulti"
 )
 
 func main() {
 	flag.Parse()
-	args := flag.Args()
+	parts := flag.Args()
+	dataType, values, err := ulti.ParseInput(parts)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		//if ulti.TypeCheck(dataType, values) {
+		result, err := ulti.Sort(dataType, values)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(result)
+		}
+		//} else {
+		//fmt.Println("Wrong type")
+		//}
+	}
 
-	fmt.Println("Output", args)
-	fmt.Println("Args", flag.Args())
 }
