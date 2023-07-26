@@ -3,10 +3,10 @@ package ulti
 import (
 	//"errors"
 	"fmt"
-	"reflect"
+	"strings"
+	//"reflect"
 	"sort"
 	"strconv"
-	"strings"
 )
 
 type sortableValues []interface{}
@@ -14,12 +14,19 @@ type sortableValues []interface{}
 func (sv sortableValues) Len() int      { return len(sv) }
 func (sv sortableValues) Swap(i, j int) { sv[i], sv[j] = sv[j], sv[i] }
 func (sv sortableValues) Less(i, j int) bool {
-	return fmt.Sprintf("%v", sv[i]) < fmt.Sprintf("%v", sv[j])
+	switch sv[i].(type) {
+	case int:
+		return sv[i].(int) < sv[j].(int)
+	case float64:
+		return sv[i].(float64) < sv[j].(float64)
+	case string:
+		return sv[i].(string) < sv[j].(string)
+	default:
+		// Add custom handling for other data types if needed
+		return false
+	}
 }
 
-func TypeCheck(dataType string, values []string) bool {
-	return dataType == reflect.TypeOf(values[0]).String()
-}
 func ParseInput(dataType string, parts []string) ([]interface{}, error) {
 	var values []interface{}
 	for _, v := range parts {
@@ -54,15 +61,13 @@ func parseValue(dataType, value string) (interface{}, error) {
 
 func Sort(dataType string, values []interface{}) (string, error) {
 	sort.Sort(sortableValues(values))
-	result := interfacetostring(values)
-	return result, nil
+	return joinValues(values), nil
 }
-func interfacetostring(values []interface{}) string {
-	stringarr := make([]string, len(values))
-	for _, val := range values {
-		stringval := strconv.Itoa(val.(int))
-		stringarr = append(stringarr, stringval)
+func joinValues(values []interface{}) string {
+	var result []string
+	for _, v := range values {
+		result = append(result, fmt.Sprintf("%v", v))
 	}
-	result := strings.Join(stringarr, " ")
-	return result
+	return strings.Join(result, " ")
 }
+
