@@ -1,7 +1,7 @@
 package ulti
 
 import (
-	"errors"
+	//"errors"
 	"fmt"
 	"reflect"
 	"sort"
@@ -19,26 +19,38 @@ func (sv sortableValues) Less(i, j int) bool {
 func TypeCheck(dataType string, values []string) bool {
 	return dataType == reflect.TypeOf(values[0]).String()
 }
-func ParseInput(parts []string) (string, []interface{}, error) {
-	if len(parts) < 2 {
-		return "", nil, errors.New("wrong input")
-	}
-	dataType := parts[0]
-	rawvalue := parts[1:]
+func ParseInput(dataType string, parts []string) ([]interface{}, error) {
 	var values []interface{}
-	for _, v := range rawvalue {
-		val := parseValue(v)
+	for _, v := range parts {
+		val, err := parseValue(dataType, v)
+		if err != nil {
+			return nil, err
+		}
 		values = append(values, val)
 	}
-	return dataType, values, nil
+	return values, nil
 }
-func parseValue(value string) interface{} {
-	num, err := strconv.Atoi(value)
-	if err == nil {
-		return num
+func parseValue(dataType, value string) (interface{}, error) {
+	switch dataType {
+	case "int":
+		num, err := strconv.Atoi(value)
+		if err != nil {
+			return nil, fmt.Errorf("invalid integer value: %s", value)
+		}
+		return num, nil
+
+	case "float":
+		num, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid float value: %s", value)
+		}
+		return num, nil
+
+	default:
+		return value, nil
 	}
-	return value
 }
+
 func Sort(dataType string, values []interface{}) ([]interface{}, error) {
 	sort.Sort(sortableValues(values))
 	return values, nil
