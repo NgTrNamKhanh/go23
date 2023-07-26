@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 type sortableValues []interface{}
@@ -51,7 +52,17 @@ func parseValue(dataType, value string) (interface{}, error) {
 	}
 }
 
-func Sort(dataType string, values []interface{}) ([]interface{}, error) {
+func Sort(dataType string, values []interface{}) (string, error) {
 	sort.Sort(sortableValues(values))
-	return values, nil
+	result := interfacetostring(values)
+	return result, nil
+}
+func interfacetostring(values []interface{}) string {
+	stringarr := make([]string, len(values))
+	for _, val := range values {
+		stringval := strconv.Itoa(val.(int))
+		stringarr = append(stringarr, stringval)
+	}
+	result := strings.Join(stringarr, " ")
+	return result
 }

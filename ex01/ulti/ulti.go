@@ -5,10 +5,7 @@ import (
 	"strings"
 )
 
-func Convert(input string, err error) string {
-	if err != nil {
-		return err.Error()
-	}
+func Convert(input string) string {
 	parts := strings.Split(input, " ")
 	handleMiddleName(parts)
 	handleMiddleName(parts)
@@ -42,9 +39,17 @@ func handleCountryCode(countryCode, firstName, middleName, lastName string) stri
 	var fullName string
 	switch countryCode {
 	case "VN", "CN", "JP", "KR", "IN", "TH", "ID", "PH", "MY", "SG":
-		fullName = lastName + " " + middleName + " " + firstName
+		if middleName != "" {
+			fullName = lastName + " " + middleName + " " + firstName
+		} else {
+			fullName = lastName + " " + firstName
+		}
 	case "US", "CA", "GB", "FR", "DE", "IT", "ES", "AU", "NZ", "BR":
-		fullName = firstName + " " + middleName + " " + lastName
+		if middleName != "" {
+			fullName = firstName + " " + middleName + " " + lastName
+		} else {
+			fullName = firstName + " " + lastName
+		}
 	default:
 		return "Invalid contry code"
 	}
