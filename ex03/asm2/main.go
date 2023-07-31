@@ -4,26 +4,29 @@ import (
 	"fmt"
 	"strconv"
 )
-
+func getNextPointer(word string,index, pointer int) int {
+	for i := index; i <= len(word); i++ {
+		if i == len(word) {
+			pointer = i
+			break
+		}
+		_, err := strconv.Atoi(string(word[i]))
+		pointer = i
+		if err != nil {
+			break
+		} else {
+			continue
+		}
+	}
+	return pointer
+}
 func numDifferentInteger(word string) []int {
 	var numarr []int
 	index := 0
 	for index < len(word)-1 {
 		pointer := index
 		var target int
-		for i := index; i <= len(word); i++ {
-			if i == len(word) {
-				pointer = i
-				break
-			}
-			_, err := strconv.Atoi(string(word[i]))
-			pointer = i
-			if err != nil {
-				break
-			} else {
-				continue
-			}
-		}
+		pointer = getNextPointer(word, index, pointer)
 		target, err := strconv.Atoi(string(word[index:pointer]))
 		if numberExists(numarr, target) || err != nil {
 			index++
@@ -45,7 +48,7 @@ func numberExists(arr []int, target int) bool {
 }
 
 func main() {
-	word := "A1b01c001"
+	word := "a123bc34d8ef34"
 	arr := numDifferentInteger(word)
 	fmt.Println(len(arr), arr)
 
