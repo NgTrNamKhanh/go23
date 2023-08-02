@@ -7,58 +7,89 @@ func stop(board [][]int, row, col int) bool {
 	}
 	return false
 }
-func goRightOnly(board [][]int, row, col int) {
+func goRightOnly(board [][]int, row, col int, flag bool) int {
 	if stop(board, row, col) {
-		return
+		return col -1
 		//return 0
 	}
-	board[row][col] = 0
-	//count := 1
-	goRightOnly(board, row, col+1)
-	// count += goRightOnly(board, row, col+1)
-	// return count
+	if !flag{
+		board[row][col] = 0
+		//count := 1
+		goRightOnly(board, row, col+1, flag)
+		return 0
+		// count += goRightOnly(board, row, col+1)
+		// return count
+	}else{
+		if board[row+1][col] == 1 {
+			board[row][col] = 0 // Mark cell as visited
+			maxCol:= goRightOnly(board, row, col+1, flag)
+			return maxCol
+		}else{
+			return col -1
+		}
+	}
+	
 }
-func goDownOnly(board [][]int, row, col int) {
+func goDownOnly(board [][]int, row, col, maxCol int) {
 	if stop(board, row, col) {
 		return
 		//return 0
 	}
-	board[row][col] = 0
-	//count := 1
-	goDownOnly(board, row+1, col)
-	//count += goDownOnly(board, row+1, col)
-	//return count
+	if maxCol == 0 {
+		board[row][col] = 0
+		//count := 1
+		goDownOnly(board, row+1, col, maxCol)
+		//count += goDownOnly(board, row+1, col)
+		//return count
+	} else {
+		var valid bool
+		for i := col; i <= maxCol; i++ {
+			if board[row][i] == 1 {
+				valid = true
+			} else {
+				valid = false
+			}
+		}
+		if valid {
+			for i := col; i <= maxCol; i++ {
+				board[row][i] = 0
+			}
+			goDownOnly(board, row+1, col, maxCol)
+		} else {
+			return
+		}
+
+	}
+
 }
 func goBoth(board [][]int, row, col int) {
 	if stop(board, row, col) {
-		return
+		return 
 		//return 0
 	}
-	if board[row+1][col] == 1 {
-		board[row][col] = 0 // Mark cell as visited
-		//count := 1
-		goDownOnly(board, row+1, col)
-		goBoth(board, row, col+1)
-		//count += goDownOnly(board, row+1, col)
-		//count += goBoth(board, row, col+1)
-		//return count
-	} else {
-		return
-		//return 0
-	}
+	board[row][col] = 0 // Mark cell as visited
+	//count := 1
+	flag := true
+	maxCol := goRightOnly(board, row, col+1, flag)
+	goDownOnly(board, row+1, col, maxCol)
+	return
+	//count += goDownOnly(board, row+1, col)
+	//count += goBoth(board, row, col+1)
+	//return count
 }
 func rectangleHanlder(board [][]int, row, col int) {
 	if stop(board, row, col) {
 		return
 		//return 0
 	}
-	if board[row+1][col] == 0 { // go right only
-		goRightOnly(board, row, col)
+	if stop(board, row+1, col) { // go right only
+		flag:= false
+		goRightOnly(board, row, col, flag)
 		//return goRightOnly(board, row, col)
-	} else if board[row][col+1] == 0 { // go down only
-		goDownOnly(board, row, col)
+	} else if stop(board, row, col+1) { // go down only
+		goDownOnly(board, row, col, 0)
 		//return goDownOnly(board, row, col)
-	} else if board[row][col+1] == 0 && board[row+1][col] == 0 { //only one
+	} else if stop(board, row, col+1) && stop(board, row+1, col) { //only one
 		board[row][col] = 0 // Mark cell as visited
 		//count := 1
 		//return count
