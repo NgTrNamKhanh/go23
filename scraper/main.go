@@ -1,24 +1,101 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
+	"os"
+	"sync"
 
-	"github.com/gocolly/colly"
+	//"strings"
+
+	//"math/rand"
+	"github.com/gocolly/colly/v2"
 )
 
+type Merch struct {
+	Title  string `json:"title"`
+	Price  string `json:"price"`
+	Status string `json:"status"`
+	Link   string `json:"link"`
+}
+
 func main() {
+
+	merch := Merch{}
+	merchs := make([]Merch, 0, 1)
 	c := colly.NewCollector(
-		colly.AllowedDomains("https://topdev.vn/viec-lam-it"),
+		colly.AllowedDomains("https://www.merchbar.com", "www.merchbar.com"),
 	)
 
-	// On every a element which has href attribute call callback
-	c.OnHTML("div[id=scroll-it-jobs]", func(e *colly.HTMLElement) {
-		link := e.Attr("href")
-		// Print link
-		fmt.Printf("Link found: %q -> %s\n", e.Text, link)
-		fmt.Println(e.Text)
-		fmt.Println("Hello")
+	c.OnRequest(func(r *colly.Request) {
+		//r.Headers.Set("Accept-Language", "en-US;q=0,9")
+		fmt.Println(fmt.Sprintf("Visiting %s", r.URL))
 	})
-	c.Visit("https://topdev.vn/viec-lam-it/python-kt34")
+	c.OnError(func(r *colly.Response, e error) {
 
+		fmt.Printf("Error while scraping %s\n", e.Error())
+	})
+	c.OnScraped(func(r *colly.Response) {
+		merchs = append(merchs, merch)
+		merch = Merch{}
+	})
+
+	var wg sync.WaitGroup
+
+	var productURLs []string
+	go c.OnHTML("a.MerchTileV2_merchTileAnchor__uw2cp", func(e *colly.HTMLElement) {
+		href := e.Attr("href")
+		//fmt.Println(href)
+		productURLs = append(productURLs, href)
+	})
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done() // Decrement the WaitGroup counter when done
+		err := c.Visit("https://www.merchbar.com/search?q=travis%20scott")
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	wg.Wait()
+	c.OnHTML("h1.merch_merchTitle__uPHuc", func(e *colly.HTMLElement) {
+		merch.Title = e.Text
+	})
+	c.OnHTML("div.merch_priceContainer__7_rcQ span.Price_salePrice__KnHC9", func(h *colly.HTMLElement) {
+		merch.Price = h.Text
+	})
+	c.OnHTML("div.merch_priceContainer__7_rcQ span.Price_price__bumLD", func(h *colly.HTMLElement) {
+		merch.Price = h.Text
+	})
+	c.OnHTML("div.MerchInfo_container__qXYh_ tbody", func(h *colly.HTMLElement) {
+		selection := h.DOM
+		childNodes := selection.Children().Nodes
+		merch.Status = selection.FindNodes(childNodes[0]).Find("span").Text()
+	})
+
+	for _, url := range productURLs {
+		productURL := scrapeUrl(url)
+		merch.Link = productURL
+		c.Visit(productURL)
+	}
+
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", " ")
+	enc.Encode(merchs)
+
+	content,err := json.Marshal(merchs)
+	if err != nil{
+		fmt.Println(err.Error())
+	}
+	os.WriteFile("merch.json", content, 0644)
 }
+
+//	func cleanDesc(s string) string {
+//		return strings.TrimSpace(s)
+//	}
+func scrapeUrl(href string) string {
+	return "https://www.merchbar.com" + href
+}
+

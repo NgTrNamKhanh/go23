@@ -1,4 +1,4 @@
-//module github.com/NgTrNamKhanh/go23/src/scraper
+//module github.com/NgTrNamKhanh/go23/scraper
 module scraper
 
 go 1.20
