@@ -1,4 +1,4 @@
-module github.com/go23/ex05
+module github.com/NgTrNamKhanh/go23/ex05
 
 go 1.20
 
