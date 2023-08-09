@@ -1,5 +1,5 @@
 //module github.com/NgTrNamKhanh/go23/scraper
-module scraper
+module shopee
 
 go 1.20
 
