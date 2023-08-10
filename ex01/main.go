@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go23/ex01/ulti"
+	"github.com/NgTrNamKhanh/ex01/ulti"
 	"os"
 	"strings"
 )

@@ -1,5 +1,4 @@
-//module github.com/NgTrNamKhanh/go23/scraper
-module src/go23/ex04
+module github.com/NgTrNamKhanh/ex04
 
 go 1.20
 
