@@ -34,6 +34,7 @@ func GetCart(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{
 		"cart": p,
+		
 	})
 	// Respond with them
 }

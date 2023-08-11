@@ -5,6 +5,7 @@ import (
 
 	"github.com/NgTrNamKhanh/ex05/repo/cart"
 	"github.com/NgTrNamKhanh/ex05/repo/product"
+	"github.com/NgTrNamKhanh/ex05/repo/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -13,6 +14,7 @@ type pgRepo struct {
 	DB      *gorm.DB
 	Product product.Repo
 	Cart    cart.Repo
+	User    user.Repo
 }
 
 func NewRepo() Repo {
@@ -25,6 +27,7 @@ func NewRepo() Repo {
 		DB:      db,
 		Product: product.NewProductRepo(db),
 		Cart:    cart.NewCartRepo(db),
+		User:    user.NewUserRepo(db),
 	}
 
 }
@@ -41,4 +44,7 @@ func (r pgRepo) Prod() product.Repo {
 }
 func (r pgRepo) C() cart.Repo {
 	return r.Cart
+}
+func (r pgRepo) Usr() user.Repo {
+	return r.User
 }

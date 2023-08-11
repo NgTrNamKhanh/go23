@@ -86,6 +86,13 @@ func (r cRepo) DeleteCart(ID string) error {
 
 // GetCartByID implements Repo.
 func (r cRepo) GetCartByID(ID string) (*model.Cart, error) {
-	p := model.Cart{}
-	return &p, r.DB.Table("carts").Where("id = ?", ID).Preload("Products").First(&p).Error
+	cart := model.Cart{}
+
+	// Load cart data along with associated cart items
+	result := r.DB.Table("carts").Where("id = ?", ID).Preload("CartItem").First(&cart)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &cart, nil
 }
